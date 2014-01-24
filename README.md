@@ -1,5 +1,4 @@
-gocs
-====
+# gocs
 
 gocs is a CloudStack client that enables Go programs to interact with the CloudStack API in a simple and uniform way.
 The package itself is smart enough to learn the available CloudStack API commands and the required and optional
@@ -13,8 +12,7 @@ executing the actual request, detailed error info will be returned to the reques
 easy to understand and fix the problem.
 
 
-Usage
-=====
+## Usage
 
 Install/Update the Go package:
 ```
@@ -27,7 +25,6 @@ import "github.com/svanharmelen/gocs"
 ```
 
 
-Documentation
-=============
+## Documentation
 
 Package documentation is dynamically generated from the source code at [GoDoc](http://godoc.org/github.com/svanharmelen/gocs)
