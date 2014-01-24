@@ -11,3 +11,23 @@ if all required parameters have a value and if all other used parameters are val
 command before actually passing the request to the API. In case of any errors during this validation or when
 executing the actual request, detailed error info will be returned to the requesting function making it very
 easy to understand and fix the problem.
+
+
+Usage
+=====
+
+Install/Update the Go package:
+```
+go get -u github.com/svanharmelen/gocs
+```
+
+Add this to your Go program:
+```
+import "github.com/svanharmelen/gocs"
+```
+
+
+Documentation
+=============
+
+Package documentation is dynamically generated from the source code at [GoDoc](http://godoc.org/github.com/svanharmelen/gocs)
