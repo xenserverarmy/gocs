@@ -15,7 +15,6 @@ import (
 )
 
 type commands map[string]*command
-type response map[string]interface{}
 
 type CloudStackClient struct {
 	client      *http.Client // The http client for communicating
