@@ -14,13 +14,6 @@ type command struct {
 	OptionalParams map[string]*apiParam
 }
 
-type listApisResult struct {
-	Listapis struct {
-		Count int
-		Api   []*apiCommand
-	} `json:"listapisresponse"`
-}
-
 type apiCommand struct {
 	Name     string
 	Isasync  bool
@@ -55,10 +48,6 @@ type asyncJobResult struct {
 	Jobstatus     float64
 	Jobresulttype string
 	Jobresult     json.RawMessage
-}
-
-type responseID struct {
-	Id string
 }
 
 // Generic function to get the first value of a response as json.RawMessage
@@ -98,7 +87,7 @@ func unmarshalListId(key string, rawJSON json.RawMessage) (string, error) {
 	if !found {
 		return "", fmt.Errorf("Unable to find id in result: %v", result)
 	}
-	var id []responseID
+	var id []struct{ Id string }
 	if err := json.Unmarshal(rawResponse, &id); err != nil {
 		return "", err
 	}
@@ -113,7 +102,7 @@ func unmarshalId(key string, rawJSON json.RawMessage) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var id responseID
+	var id struct{ Id string }
 	if err := json.Unmarshal(rawResponse, &id); err != nil {
 		return "", err
 	}
@@ -145,7 +134,12 @@ func unmarshalAsyncJobResponse(rawJSON json.RawMessage) (*asyncJobResult, error)
 }
 
 func unmarshalApiCommands(rawJSON json.RawMessage) (commands, error) {
-	var apisResult listApisResult
+	var apisResult struct {
+		Listapis struct {
+			Count int
+			Api   []*apiCommand
+		} `json:"listapisresponse"`
+	}
 	if err := json.Unmarshal(rawJSON, &apisResult); err != nil {
 		return nil, err
 	}
