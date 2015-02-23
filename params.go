@@ -67,11 +67,11 @@ func parseParams(rawParams string) (csparams, error) {
 	}
 	paramSlice := strings.Split(rawParams, ",")
 	for _, paramSet := range paramSlice {
-		keyValue := strings.Split(paramSet, ":")
+		keyValue := strings.SplitN(paramSet, ":", 2)
 		if len(keyValue) != 2 || len(keyValue[value]) == 0 {
 			return nil, fmt.Errorf("Error processing parameters around: ... %s ...", paramSet)
 		}
-		params[strings.ToLower(strings.Trim(strings.TrimSpace(keyValue[key]), `"`))] = strings.ToLower(strings.Trim(strings.TrimSpace(keyValue[value]), `"`))
+		params[strings.ToLower(strings.Trim(strings.TrimSpace(keyValue[key]), `"`))] = strings.Trim(strings.TrimSpace(keyValue[value]), `"`)
 	}
 	return params, nil
 }

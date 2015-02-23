@@ -95,6 +95,7 @@ func unmarshalListId(key string, rawJSON json.RawMessage) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	var result map[string]json.RawMessage
 	if err := json.Unmarshal(rawResponse, &result); err != nil {
 		return "", err
@@ -103,6 +104,7 @@ func unmarshalListId(key string, rawJSON json.RawMessage) (string, error) {
 	if !found {
 		return "", fmt.Errorf("Unable to find id in result: %v", result)
 	}
+
 	var id []struct{ Id string }
 	if err := json.Unmarshal(rawResponse, &id); err != nil {
 		return "", err
@@ -114,16 +116,86 @@ func unmarshalListId(key string, rawJSON json.RawMessage) (string, error) {
 }
 
 func unmarshalId(key string, rawJSON json.RawMessage) (string, error) {
+
+	// strip out the message header since we know what type of response we have
 	rawResponse, err := getRawValue(rawJSON)
 	if err != nil {
 		return "", err
 	}
-	var id struct{ Id string }
-	if err := json.Unmarshal(rawResponse, &id); err != nil {
+
+	// we should now have something which contains a "count" and an object based on the key
+	var result map[string]json.RawMessage
+	if err := json.Unmarshal(rawResponse, &result); err != nil {
 		return "", err
 	}
-	return id.Id, nil
+
+	// if we're lucky, the input key (found during Api enumeration) will be present
+	rawResult, found := result[key]
+	if !found {
+		// ok so this isn't good, but it doens't mean the end of the world
+		// go find that response key and see if it pattern matches the input key
+		for responseKey, value := range result {
+			if strings.Contains (strings.ToLower(key), strings.ToLower(responseKey) ) {
+				found = true
+				key = responseKey
+				rawResult = value
+				break
+			}
+		}
+		
+		if (!found) {
+			return "", fmt.Errorf("Unable to find key '%s' in result: %v", key, result)
+		}
+	}
+
+	var id []struct{ Id string }
+	if err := json.Unmarshal(rawResult, &id); err != nil {
+		return "", err
+	}
+	if len(id) > 1 {
+		return "", fmt.Errorf("Multiple id's found in result: %s", string(rawResponse))
+	}
+	return id[0].Id, nil
 }
+
+
+// this one is exported to allow for callers to readily obtain the real response data
+func UnmarshalResponse(key string, rawJSON json.RawMessage) (json.RawMessage, error) {
+
+	// strip out the message header since we know what type of response we have
+	rawResponse, err := getRawValue(rawJSON)
+	if err != nil {
+		return nil, err
+	}
+
+	// we should now have something which contains a "count" and an object based on the key
+	var result map[string]json.RawMessage
+	if err := json.Unmarshal(rawResponse, &result); err != nil {
+		return nil, err
+	}
+
+	// if we're lucky, the input key (found during Api enumeration) will be present
+	rawResult, found := result[key]
+	if !found {
+		// ok so this isn't good, but it doens't mean the end of the world
+		// go find that response key and see if it pattern matches the input key
+		for responseKey, value := range result {
+			if strings.Contains (strings.ToLower(key), strings.ToLower(responseKey) ) {
+				found = true
+				key = responseKey
+				rawResult = value
+				break
+			}
+		}
+		
+		if (!found) {
+			return nil, fmt.Errorf("Unable to find key '%s' in result: %v", key, result)
+		}
+	}
+
+	return rawResult, nil
+}
+
 
 func unmarshalAsyncResponse(rawJSON json.RawMessage) (*asyncResult, error) {
 	rawResponse, err := getRawValue(rawJSON)
