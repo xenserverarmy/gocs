@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/kardianos/osext"
+	"github.com/kardianos/osext"
 )
 
 var cacheFile string
